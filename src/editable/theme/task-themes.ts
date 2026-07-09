@@ -2,13 +2,10 @@ import type { CSSProperties } from 'react'
 import type { TaskKey } from '@/lib/site-config'
 
 /*
-  Yelp-style task surfaces.
+  Cycasidea directory task surfaces.
 
-  Every task (archive + detail) now shares one cohesive premium identity:
-  clean white surfaces, the signature Yelp red accent, hairline gray borders
-  and a single crisp sans-serif — exactly like Yelp. Per-task copy (kicker /
-  note) still varies so each section keeps a little voice, but the visual
-  language is unified. Tokens are delivered via CSS variables (`--tk-*`).
+  Every archive and detail page shares the same useful blue directory identity:
+  clean white surfaces, pale blue bands, fine borders, and crisp sans type.
 */
 
 export type TaskTheme = {
@@ -34,21 +31,21 @@ export type TaskTheme = {
 
 const YELP_FONT = "'Inter', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif"
 
-// Shared Yelp palette — every task inherits this; only kicker/note differ.
+// Shared directory palette; only kicker/note differ by task.
 const base = {
   dark: false,
   fontDisplay: YELP_FONT,
   fontBody: YELP_FONT,
-  bg: '#ffffff',
+  bg: '#f7fbff',
   surface: '#ffffff',
-  raised: '#f7f7f7',
-  text: '#1a1a1a',
-  muted: '#6b6b6b',
-  line: '#e6e6e6',
-  accent: '#d32323',
-  accentSoft: '#fdecec',
+  raised: '#eef5ff',
+  text: '#162033',
+  muted: '#657184',
+  line: '#dbe5f2',
+  accent: '#3d73cf',
+  accentSoft: '#eaf3ff',
   onAccent: '#ffffff',
-  glow: 'rgba(211,35,35,0.06)',
+  glow: 'rgba(61,115,207,0.16)',
   radius: '0.75rem',
 } satisfies Omit<TaskTheme, 'kicker' | 'note'>
 

@@ -25,10 +25,26 @@ body {
 }
 
 .editable-site-root {
-  /* Yelp-style clean sans, used for both display and body. */
+  --slot4-page-bg: #ffffff;
+  --slot4-page-text: #162033;
+  --slot4-surface-bg: #ffffff;
+  --slot4-muted-text: #657184;
+  --slot4-accent: #3d73cf;
+  --slot4-accent-fill: #2f6bc8;
+  --slot4-accent-soft: #eaf3ff;
+  --slot4-on-accent: #ffffff;
+  --slot4-media-bg: #d8e7f7;
+  --slot4-warm: #f7fbff;
+  --editable-nav-bg: rgba(22, 32, 51, 0.72);
+  --editable-nav-text: #ffffff;
+  --editable-footer-bg: #477dcc;
+  --editable-footer-text: #ffffff;
+  --editable-border: #dbe5f2;
+  --editable-cta-bg: #3d73cf;
+  --editable-cta-text: #ffffff;
+  --editable-container: 1180px;
   --editable-font-display: 'Inter', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
   --editable-font-body: 'Inter', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
-  /* Premium easing curve used across every hover + transition. */
   --ease-premium: cubic-bezier(0.22, 1, 0.36, 1);
   font-family: var(--editable-font-body);
 }
@@ -97,8 +113,8 @@ body {
 }
 
 ::selection {
-  background: color-mix(in oklab, var(--slot4-accent-fill) 28%, transparent);
-  color: var(--slot4-page-text);
+  background: #2f6bc8;
+  color: #ffffff;
 }
 
 ::-webkit-scrollbar-track {
@@ -120,4 +136,38 @@ body {
 
 .article-content a {
   color: var(--slot4-accent-fill);
+}
+
+@keyframes cycas-hero-breathe {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(0, -8px, 0) scale(1.015); }
+}
+
+@keyframes cycas-slide-loop {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.cycas-tilt-card {
+  transform: rotate(-1.5deg);
+  animation: cycas-hero-breathe 7s ease-in-out infinite;
+}
+
+.cycas-slider {
+  mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+}
+
+.cycas-slider > * {
+  animation: cycas-slide-loop 38s linear infinite;
+}
+
+.cycas-slider:hover > * {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cycas-tilt-card,
+  .cycas-slider > * {
+    animation: none;
+  }
 }

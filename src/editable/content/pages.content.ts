@@ -106,8 +106,8 @@ export const pagesContent = {
     },
     hero: {
       badge: 'Publishing workspace',
-      title: 'Create content for every active section.',
-      description: 'Choose the content type, add details, and prepare a clean post with images, links, summary, and body content.',
+      title: 'Share something useful with the community.',
+      description: 'Add accurate details, a helpful summary, and clear content for readers and customers.',
     },
     formTitle: 'Content details',
     submitLabel: 'Submit content',

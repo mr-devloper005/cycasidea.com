@@ -2,7 +2,7 @@
 
 import { FormEvent, useMemo, useState } from 'react'
 import Link from 'next/link'
-import { ArrowRight, CheckCircle2, FileText, ImageIcon, Lock, PlusCircle, Send, Sparkles } from 'lucide-react'
+import { ArrowRight, CheckCircle2, FileText, Globe2, ImageIcon, Link2, Lock, Send, Tag } from 'lucide-react'
 import { SITE_CONFIG, type TaskKey } from '@/lib/site-config'
 import { EditableSiteShell } from '@/editable/shell/EditableSiteShell'
 import { useEditableLocalAuthSession } from '@/editable/components/EditableLocalAuthForms'
@@ -22,17 +22,7 @@ type DraftPost = {
 
 const STORE_KEY = 'slot4:created-posts'
 
-const taskIcon: Record<string, typeof FileText> = {
-  article: FileText,
-  listing: Sparkles,
-  classified: PlusCircle,
-  image: ImageIcon,
-  profile: Sparkles,
-  pdf: FileText,
-  sbm: ArrowRight,
-}
-
-const fieldClass = 'rounded-2xl border border-[var(--editable-border)] bg-white px-4 py-3 text-sm font-bold text-[var(--editable-page-text,#2f1d16)] outline-none transition placeholder:text-current/35 focus:border-current'
+const fieldClass = 'w-full rounded-lg border border-[#cbd8eb] bg-white px-4 py-3 text-sm font-semibold text-[#17233b] outline-none transition placeholder:text-[#71809a] focus:border-[#2f6bc8] focus:ring-4 focus:ring-[#2f6bc8]/10'
 
 const saveDraft = (draft: DraftPost) => {
   try {
@@ -108,44 +98,61 @@ export default function CreatePage() {
     <EditableSiteShell>
       <main className="min-h-screen bg-[var(--editable-page-bg,#fff7ee)] text-[var(--editable-page-text,#2f1d16)]">
         <section className="mx-auto max-w-[var(--editable-container)] px-4 py-10 sm:px-6 lg:px-8 lg:py-16">
-          <div className="grid gap-8 rounded-[2.8rem] border border-[var(--editable-border)] bg-white/75 p-6 shadow-[0_30px_90px_rgba(15,23,42,0.08)] backdrop-blur lg:grid-cols-[0.85fr_1.15fr] lg:p-10">
-            <aside>
-              <p className="text-xs font-black uppercase tracking-[0.28em] opacity-55">{pagesContent.create.hero.badge}</p>
-              <h1 className="mt-5 text-5xl font-black leading-[0.92] tracking-[-0.08em] sm:text-7xl">{pagesContent.create.hero.title}</h1>
-              <p className="mt-6 max-w-xl text-base font-semibold leading-8 opacity-70">{pagesContent.create.hero.description}</p>
-              <div className="mt-8 grid gap-3 sm:grid-cols-2">
-                {enabledTasks.map((item) => {
-                  const Icon = taskIcon[item.key] || FileText
-                  const active = item.key === task
-                  return (
-                    <button key={item.key} type="button" onClick={() => setTask(item.key)} className={`rounded-2xl border p-4 text-left transition ${active ? 'border-current bg-[var(--editable-page-text,#2f1d16)] text-[var(--editable-page-bg,#fff7ee)]' : 'border-[var(--editable-border)] bg-white hover:-translate-y-0.5'}`}>
-                      <Icon className="h-5 w-5" />
-                      <span className="mt-3 block text-sm font-black">{item.label}</span>
-                      <span className="mt-1 block text-xs font-semibold opacity-65">{item.description}</span>
-                    </button>
-                  )
-                })}
+          <div className="overflow-hidden rounded-lg border border-[#cbd8eb] bg-white shadow-[0_24px_70px_rgba(22,49,85,0.12)]">
+            <header className="border-b border-[#cbd8eb] bg-[#dceafa] px-6 py-8 sm:px-10 lg:flex lg:items-end lg:justify-between lg:gap-10">
+              <div>
+                <p className="text-xs font-black uppercase tracking-[0.24em] text-[#2f6bc8]">{pagesContent.create.hero.badge}</p>
+                <h1 className="mt-3 max-w-3xl text-4xl font-black leading-tight text-[#14233d] sm:text-5xl">{pagesContent.create.hero.title}</h1>
+                <p className="mt-3 max-w-2xl text-base font-medium leading-7 text-[#52627b]">{pagesContent.create.hero.description}</p>
               </div>
-            </aside>
+              <div className="mt-5 flex items-center gap-3 text-sm font-bold text-[#14233d] lg:mt-0">
+                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#2f6bc8] text-white">{session.name.slice(0, 1).toUpperCase()}</span>
+                <span>{session.name}</span>
+              </div>
+            </header>
 
-            <form onSubmit={submit} className="rounded-[2.2rem] border border-[var(--editable-border)] bg-[var(--editable-page-bg,#fff7ee)] p-5 sm:p-7">
+            <form onSubmit={submit} className="p-6 sm:p-10">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <p className="text-xs font-black uppercase tracking-[0.22em] opacity-50">Create {activeTask?.label || 'post'}</p>
-                  <h2 className="mt-1 text-3xl font-black tracking-[-0.06em]">{pagesContent.create.formTitle}</h2>
+                  <p className="text-xs font-black uppercase tracking-[0.2em] text-[#2f6bc8]">New submission</p>
+                  <h2 className="mt-1 text-3xl font-black text-[#14233d]">{pagesContent.create.formTitle}</h2>
                 </div>
-                <span className="rounded-full bg-white px-4 py-2 text-xs font-black uppercase tracking-[0.16em]">{session.name}</span>
+                <span className="rounded-full bg-[#edf4fd] px-4 py-2 text-xs font-black uppercase tracking-[0.12em] text-[#2f6bc8]">{activeTask?.label || 'Post'}</span>
               </div>
 
-              <div className="mt-6 grid gap-4">
-                <input className={fieldClass} value={title} onChange={(event) => setTitle(event.target.value)} placeholder="Post title" required />
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <input className={fieldClass} value={category} onChange={(event) => setCategory(event.target.value)} placeholder="Category" />
-                  <input className={fieldClass} value={url} onChange={(event) => setUrl(event.target.value)} placeholder="Website or source URL" />
+              <div className="mt-7 grid gap-6">
+                <label className="grid gap-2 text-sm font-bold text-[#263754]">
+                  Content type
+                  <select className={fieldClass} value={task} onChange={(event) => setTask(event.target.value as TaskKey)}>
+                    {enabledTasks.map((item) => <option key={item.key} value={item.key}>{item.label}</option>)}
+                  </select>
+                </label>
+                <label className="grid gap-2 text-sm font-bold text-[#263754]">
+                  <span className="flex items-center gap-2"><FileText className="h-4 w-4 text-[#2f6bc8]" /> Title</span>
+                  <input className={fieldClass} value={title} onChange={(event) => setTitle(event.target.value)} placeholder="Enter a clear, descriptive title" required />
+                </label>
+                <div className="grid gap-6 sm:grid-cols-2">
+                  <label className="grid gap-2 text-sm font-bold text-[#263754]">
+                    <span className="flex items-center gap-2"><Tag className="h-4 w-4 text-[#2f6bc8]" /> Category</span>
+                    <input className={fieldClass} value={category} onChange={(event) => setCategory(event.target.value)} placeholder="For example, Technology" />
+                  </label>
+                  <label className="grid gap-2 text-sm font-bold text-[#263754]">
+                    <span className="flex items-center gap-2"><Link2 className="h-4 w-4 text-[#2f6bc8]" /> Website or source</span>
+                    <input className={fieldClass} value={url} onChange={(event) => setUrl(event.target.value)} placeholder="https://example.com" />
+                  </label>
                 </div>
-                <input className={fieldClass} value={image} onChange={(event) => setImage(event.target.value)} placeholder="Featured image URL" />
-                <textarea className={`${fieldClass} min-h-24`} value={summary} onChange={(event) => setSummary(event.target.value)} placeholder="Short summary" required />
-                <textarea className={`${fieldClass} min-h-48`} value={body} onChange={(event) => setBody(event.target.value)} placeholder="Main content, details, notes, or description" required />
+                <label className="grid gap-2 text-sm font-bold text-[#263754]">
+                  <span className="flex items-center gap-2"><ImageIcon className="h-4 w-4 text-[#2f6bc8]" /> Featured image</span>
+                  <input className={fieldClass} value={image} onChange={(event) => setImage(event.target.value)} placeholder="Paste an image URL" />
+                </label>
+                <label className="grid gap-2 text-sm font-bold text-[#263754]">
+                  Short summary
+                  <textarea className={`${fieldClass} min-h-28 resize-y`} value={summary} onChange={(event) => setSummary(event.target.value)} placeholder="Give readers a useful overview" required />
+                </label>
+                <label className="grid gap-2 text-sm font-bold text-[#263754]">
+                  <span className="flex items-center gap-2"><Globe2 className="h-4 w-4 text-[#2f6bc8]" /> Main content</span>
+                  <textarea className={`${fieldClass} min-h-56 resize-y`} value={body} onChange={(event) => setBody(event.target.value)} placeholder="Add the full description, details, or article content" required />
+                </label>
               </div>
 
               {created ? (
@@ -155,7 +162,7 @@ export default function CreatePage() {
                 </div>
               ) : null}
 
-              <button type="submit" className="mt-5 inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-[var(--editable-page-text,#2f1d16)] px-6 text-sm font-black uppercase tracking-[0.18em] text-[var(--editable-page-bg,#fff7ee)] transition hover:-translate-y-0.5">
+              <button type="submit" className="mt-7 inline-flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-[#2f6bc8] px-6 text-sm font-black uppercase tracking-[0.14em] text-white transition hover:bg-[#2459a9] focus:outline-none focus:ring-4 focus:ring-[#2f6bc8]/20">
                 <Send className="h-4 w-4" /> {pagesContent.create.submitLabel}
               </button>
             </form>
