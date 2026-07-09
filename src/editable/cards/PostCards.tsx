@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ArrowRight, Clock3 } from 'lucide-react'
+import { ArrowRight, Clock3, FileText } from 'lucide-react'
 import type { SitePost } from '@/lib/site-connector'
 import type { TaskKey } from '@/lib/site-config'
 import { editableDesignContract as dc, editablePalette as pal } from '@/editable/layouts/design-contract'
@@ -11,7 +11,7 @@ export function getEditablePostImage(post?: SitePost | null) {
   const images = Array.isArray(content.images) ? content.images : []
   const contentImage = images.find((url): url is string => typeof url === 'string' && Boolean(url))
   const logo = typeof content.logo === 'string' ? content.logo : ''
-  return mediaUrl || contentImage || logo || '/placeholder.svg?height=900&width=1400'
+  return mediaUrl || contentImage || logo || ''
 }
 
 export function getEditableExcerpt(post?: SitePost | null, limit = 150) {
@@ -35,10 +35,11 @@ export function postHref(task: TaskKey, post: SitePost, route = `/${task}`) {
 }
 
 export function EditorialFeatureCard({ post, href, label = 'Featured read' }: { post: SitePost; href: string; label?: string }) {
+  const image = getEditablePostImage(post)
   return (
     <Link href={href} className={`group block min-w-0 overflow-hidden ${dc.surface.dark} ${dc.motion.lift}`}>
       <div className="relative min-h-[520px] p-6 sm:p-8 lg:min-h-[620px]">
-        <img src={getEditablePostImage(post)} alt={post.title} className="absolute inset-0 h-full w-full object-cover opacity-55 transition duration-500 group-hover:scale-105" />
+        {image ? <img src={image} alt={post.title} className="absolute inset-0 h-full w-full object-cover opacity-55 transition duration-500 group-hover:scale-105" /> : <div className="absolute inset-0 flex items-center justify-center bg-[var(--slot4-media-bg)]"><FileText className="h-16 w-16 text-[var(--slot4-accent)]" /></div>}
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(24,20,17,0.1),rgba(24,20,17,0.86))]" />
         <div className="relative z-10 flex h-full min-h-[460px] flex-col justify-end lg:min-h-[560px]">
           <span className={`${dc.type.eyebrow} ${pal.accentSoftText}`}>{label}</span>
@@ -54,10 +55,11 @@ export function EditorialFeatureCard({ post, href, label = 'Featured read' }: { 
 }
 
 export function RailPostCard({ post, href, index }: { post: SitePost; href: string; index: number }) {
+  const image = getEditablePostImage(post)
   return (
     <Link href={href} className={`group ${dc.layout.minRailCard} block overflow-hidden ${dc.surface.card} ${dc.motion.lift}`}>
       <div className={`${dc.media.frame} ${dc.media.ratio}`}>
-        <img src={getEditablePostImage(post)} alt={post.title} className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+        {image ? <img src={image} alt={post.title} className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105" /> : <div className="absolute inset-0 flex items-center justify-center bg-[var(--slot4-media-bg)]"><FileText className="h-8 w-8 text-[var(--slot4-accent)]" /></div>}
         <span className={`absolute left-4 top-4 rounded-full ${pal.darkBg} px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-white`}>No. {String(index + 1).padStart(2, '0')}</span>
       </div>
       <div className="p-5">
@@ -85,10 +87,11 @@ export function CompactIndexCard({ post, href, index }: { post: SitePost; href: 
 }
 
 export function ArticleListCard({ post, href, index }: { post: SitePost; href: string; index: number }) {
+  const image = getEditablePostImage(post)
   return (
     <Link href={href} className={`group grid min-w-0 gap-5 overflow-hidden ${dc.surface.card} p-4 ${dc.motion.lift} sm:grid-cols-[220px_minmax(0,1fr)]`}>
       <div className={`${dc.media.frame} aspect-[16/12] sm:aspect-auto sm:min-h-[190px]`}>
-        <img src={getEditablePostImage(post)} alt={post.title} className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+        {image ? <img src={image} alt={post.title} className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105" /> : <div className="absolute inset-0 flex items-center justify-center bg-[var(--slot4-media-bg)]"><FileText className="h-9 w-9 text-[var(--slot4-accent)]" /></div>}
       </div>
       <div className="min-w-0 p-2 sm:py-4 sm:pr-5">
         <p className={`${dc.type.eyebrow} ${pal.accentText}`}>Read {String(index + 1).padStart(2, '0')}</p>

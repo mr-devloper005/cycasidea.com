@@ -53,20 +53,17 @@ export default async function HomePage() {
         }}
       />
       <EditableHomeHero primaryTask={primaryTask} primaryRoute={primaryRoute} posts={primaryPosts} timeSections={timeSections} />
-      <div className="mx-auto max-w-6xl px-4 py-6">
-  <Ads slot="header" showLabel eager className="mx-auto w-full" />
-</div>
-
       <EditableStoryRail primaryTask={primaryTask} primaryRoute={primaryRoute} posts={primaryPosts} timeSections={timeSections} />
+      <div className="mx-auto max-w-6xl px-4 py-8">
+        <Ads slot="in-feed" showLabel eager className="mx-auto w-full" />
+      </div>
       <EditableMagazineSplit primaryTask={primaryTask} primaryRoute={primaryRoute} posts={primaryPosts} timeSections={timeSections} />
-
+      <div className="mx-auto max-w-6xl px-4 py-8">
+        <Ads slot="article-bottom" showLabel className="mx-auto w-full" />
+      </div>
       <EditableTimeCollections primaryTask={primaryTask} primaryRoute={primaryRoute} posts={primaryPosts} timeSections={timeSections} />
-      <div className="mx-auto max-w-6xl px-4 py-6">
-  <Ads slot="sidebar" showLabel eager className="mx-auto w-full" />
-</div>
       <EditableHomeCta />
       </main>
     </EditableSiteShell>
   )
 }
-
