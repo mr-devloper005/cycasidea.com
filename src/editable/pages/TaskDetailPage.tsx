@@ -8,6 +8,7 @@ import type { SitePost } from '@/lib/site-connector'
 import { EditableSiteShell } from '@/editable/shell/EditableSiteShell'
 import { EditableArticleComments } from '@/editable/components/EditableArticleComments'
 import { getTaskTheme, taskThemeStyle } from '@/editable/theme/task-themes'
+import { Ads } from '@/lib/ads'
 
 export const revalidate = 3
 
@@ -114,9 +115,17 @@ const mapSrcFor = (post: SitePost) => {
 }
 
 export function TaskDetailView({ task, post, related, comments = [] }: { task: TaskKey; post: SitePost; related: SitePost[]; comments?: Array<{ id: string; name: string; comment: string; createdAt: string }> }) {
+  const topAd = task === 'article' ? 'header' : task === 'listing' ? 'sidebar' : 'in-feed'
+  const bottomAd = task === 'article' ? 'article-bottom' : task === 'listing' ? 'footer' : 'footer'
+  const hasInlineAd = task === 'article' || task === 'listing'
   return (
     <EditableSiteShell>
       <main style={taskThemeStyle(task)} className="min-h-screen bg-[var(--tk-bg)] text-[var(--tk-text)]">
+        {!hasInlineAd ? (
+          <div className="mx-auto max-w-6xl px-4 pb-2 pt-28">
+            <Ads slot={topAd} showLabel eager className="mx-auto w-full" />
+          </div>
+        ) : null}
         {task === 'listing' ? <ListingDetail post={post} related={related} /> : null}
         {task === 'classified' ? <ClassifiedDetail post={post} related={related} /> : null}
         {task === 'image' ? <ImageDetail post={post} related={related} /> : null}
@@ -124,13 +133,18 @@ export function TaskDetailView({ task, post, related, comments = [] }: { task: T
         {task === 'pdf' ? <PdfDetail post={post} related={related} /> : null}
         {task === 'profile' ? <ProfileDetail post={post} related={related} /> : null}
         {task === 'article' ? <ArticleDetail post={post} related={related} comments={comments} /> : null}
+        {!hasInlineAd ? (
+          <div className="mx-auto max-w-6xl px-4 py-6">
+            <Ads slot={bottomAd} showLabel className="mx-auto w-full" />
+          </div>
+        ) : null}
       </main>
     </EditableSiteShell>
   )
 }
 
-// Yelp-style red star rating row. Uses real rating/review fields when present,
-// otherwise a stable derived value (wire to real data when available).
+// Directory rating row. Uses real rating/review fields when present, otherwise
+// a stable derived value.
 const hashStr = (value: string) => {
   let h = 0
   for (let i = 0; i < value.length; i += 1) h = (h * 31 + value.charCodeAt(i)) >>> 0
@@ -189,21 +203,30 @@ function BackLink({ task }: { task: TaskKey }) {
   )
 }
 
-// ----- Article: a quiet, centred reading column -----
+// ----- Article: editorial lead with a focused reading column -----
 function ArticleDetail({ post, related, comments }: { post: SitePost; related: SitePost[]; comments: Array<{ id: string; name: string; comment: string; createdAt: string }> }) {
   const images = getImages(post)
   return (
     <>
-      <article className="mx-auto max-w-4xl px-6 py-14 sm:py-20">
-        <BackLink task="article" />
-        <p className="mt-10 text-xs font-medium uppercase tracking-[0.28em] text-[var(--tk-accent)]">{categoryOf(post, 'Article')}</p>
-        <h1 className="editable-display mt-5 text-balance text-4xl font-semibold leading-[1.06] tracking-[-0.03em] sm:text-5xl lg:text-[3.4rem]">{post.title}</h1>
-        <div className="mt-6 text-sm text-[var(--tk-muted)]">
-          <span>{SITE_CONFIG.name}</span>
+      <article className="pt-20">
+        <header className="border-b border-[var(--tk-line)] bg-[#e7f0fb]">
+          <div className="mx-auto grid max-w-[var(--editable-container)] gap-10 px-6 py-16 lg:grid-cols-[minmax(0,1fr)_0.75fr] lg:items-end lg:px-8 lg:py-20">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--tk-accent)]">{categoryOf(post, 'Article')}</p>
+              <h1 className="editable-display mt-5 text-balance text-4xl font-semibold leading-[1.05] tracking-[-0.03em] sm:text-5xl lg:text-6xl">{post.title}</h1>
+              <p className="mt-6 text-sm font-medium text-[var(--tk-muted)]">Published by {SITE_CONFIG.name}</p>
+            </div>
+            {images[0] ? <img src={images[0]} alt="" className="aspect-[4/3] w-full rounded-lg border border-[var(--tk-line)] object-cover shadow-lg" /> : <div className="flex aspect-[4/3] items-center justify-center rounded-lg bg-white"><FileText className="h-16 w-16 text-[var(--tk-accent)]" /></div>}
+          </div>
+        </header>
+        <div className="mx-auto max-w-5xl px-6 py-10">
+          <Ads slot="in-feed" showLabel eager className="mx-auto w-full" />
         </div>
-        {images[0] ? <img src={images[0]} alt="" className="mt-10 aspect-[16/9] w-full rounded-[var(--tk-radius)] border border-[var(--tk-line)] object-cover" /> : null}
-        <BodyContent post={post} />
-        <EditableArticleComments slug={post.slug} comments={comments} />
+        <div className="mx-auto max-w-3xl px-6 pb-16">
+          {leadText(post) ? <p className="border-l-4 border-[var(--tk-accent)] pl-6 text-xl leading-9 text-[var(--tk-muted)]">{leadText(post)}</p> : null}
+          <BodyContent post={post} />
+          <EditableArticleComments slug={post.slug} comments={comments} />
+        </div>
       </article>
       <RelatedStrip task="article" related={related} />
     </>
@@ -220,10 +243,9 @@ function ListingDetail({ post, related }: { post: SitePost; related: SitePost[] 
   const website = getField(post, ['website', 'url'])
   const mapSrc = mapSrcFor(post)
   return (
-    <section className="mx-auto max-w-[var(--editable-container)] px-6 py-14 sm:py-20 lg:px-8">
-      <BackLink task="listing" />
-      <div className="mt-8 grid gap-10 lg:grid-cols-[minmax(0,1fr)_380px]">
-        <article className="min-w-0">
+    <section className="mx-auto max-w-[var(--editable-container)] px-6 pb-20 pt-32 lg:px-8">
+      <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_380px]">
+        <article className="min-w-0 rounded-lg border border-[var(--tk-line)] bg-[var(--tk-surface)] p-6 shadow-[0_24px_70px_rgba(15,23,42,0.08)] sm:p-9">
           <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
             <div className="flex h-28 w-28 shrink-0 items-center justify-center overflow-hidden rounded-[var(--tk-radius)] border border-[var(--tk-line)] bg-[var(--tk-raised)]">
               {logo ? <img src={logo} alt="" className="h-full w-full object-cover" /> : <Building2 className="h-12 w-12 text-[var(--tk-muted)]" />}
@@ -236,6 +258,9 @@ function ListingDetail({ post, related }: { post: SitePost; related: SitePost[] 
           </div>
           {leadText(post) ? <p className="mt-7 max-w-2xl text-lg leading-8 text-[var(--tk-muted)]">{leadText(post)}</p> : null}
           <InfoGrid items={[['Location', address, MapPin], ['Phone', phone, Phone], ['Email', email, Mail], ['Website', website, Globe2]]} />
+          <div className="mt-10">
+            <Ads slot="article-bottom" showLabel eager className="mx-auto w-full" />
+          </div>
           <Divider />
           <BodyContent post={post} />
           <ImageStrip images={images.slice(1)} label="Showcase" />
@@ -243,7 +268,7 @@ function ListingDetail({ post, related }: { post: SitePost; related: SitePost[] 
         <aside className="space-y-6 lg:sticky lg:top-24 lg:self-start">
           {mapSrc ? <MapBox src={mapSrc} label={address || post.title} /> : null}
           <ContactAction website={website} phone={phone} email={email} />
-          <RelatedPanel task="listing" post={post} related={related} />
+          <RelatedPanel task="listing" related={related} />
         </aside>
       </div>
     </section>
@@ -293,18 +318,22 @@ function ClassifiedDetail({ post, related }: { post: SitePost; related: SitePost
 // ----- Image: a dark, gallery-led canvas -----
 function ImageDetail({ post, related }: { post: SitePost; related: SitePost[] }) {
   const images = getImages(post)
-  const gallery = images.length ? images : ['/placeholder.svg?height=900&width=1200']
+  const gallery = images
   return (
     <>
       <section className="mx-auto max-w-[var(--editable-container)] px-6 py-14 sm:py-20 lg:px-8">
         <BackLink task="image" />
         <div className="mt-8 grid gap-10 lg:grid-cols-[1.4fr_0.6fr]">
           <div className="columns-1 gap-5 [column-fill:_balance] sm:columns-2">
-            {gallery.map((image, index) => (
+            {gallery.length ? gallery.map((image, index) => (
               <figure key={`${image}-${index}`} className="mb-5 break-inside-avoid overflow-hidden rounded-[var(--tk-radius)] border border-[var(--tk-line)] bg-[var(--tk-surface)]">
                 <img src={image} alt="" className="w-full object-cover" />
               </figure>
-            ))}
+            )) : (
+              <div className="flex min-h-[360px] items-center justify-center rounded-[var(--tk-radius)] border border-[var(--tk-line)] bg-[var(--tk-raised)]">
+                <Camera className="h-16 w-16 text-[var(--tk-accent)]" />
+              </div>
+            )}
           </div>
           <aside className="lg:sticky lg:top-24 lg:self-start">
             <div className="inline-flex items-center gap-2 rounded-full border border-[var(--tk-line)] px-3.5 py-1.5 text-xs font-medium text-[var(--tk-muted)]"><Camera className="h-3.5 w-3.5 text-[var(--tk-accent)]" /> Image story</div>
@@ -376,7 +405,7 @@ function PdfDetail({ post, related }: { post: SitePost; related: SitePost[] }) {
               <Link href={fileUrl} target="_blank" rel="noreferrer" className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[var(--tk-accent)] px-5 py-3 text-sm font-semibold text-[var(--tk-on-accent)] transition hover:opacity-90">Download <Download className="h-4 w-4" /></Link>
             </div>
           ) : null}
-          <RelatedPanel task="pdf" post={post} related={related} />
+          <RelatedPanel task="pdf" related={related} />
         </aside>
       </div>
     </section>
@@ -494,7 +523,7 @@ function BadgeLine({ label, value }: { label: string; value: string }) {
   )
 }
 
-function RelatedPanel({ task, post, related }: { task: TaskKey; post: SitePost; related: SitePost[] }) {
+function RelatedPanel({ task, related }: { task: TaskKey; related: SitePost[] }) {
   const taskConfig = getTaskConfig(task)
   return (
     <div className="space-y-6">
@@ -540,7 +569,7 @@ function RelatedStrip({ task, related }: { task: TaskKey; related: SitePost[] })
 
 function RelatedCard({ task, post, grid = false }: { task: TaskKey; post: SitePost; grid?: boolean }) {
   const image = getImages(post)[0]
-  // Build the detail URL from the task route (e.g. /listing/<slug>) — the same
+  // Build the detail URL from the task route (e.g. /listing/<slug>), the same
   // base the archive cards use. buildPostUrl() can fall back to /posts when the
   // task isn't in the enabled taskViews map, which 404s.
   const href = `${getTaskConfig(task)?.route || `/${task}`}/${post.slug}`
@@ -567,4 +596,3 @@ function RelatedCard({ task, post, grid = false }: { task: TaskKey; post: SitePo
     </Link>
   )
 }
-
